@@ -46,7 +46,7 @@ def get_tweet(username, since):
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
 
         attributes_container.append([tweet.date, tweet.id, tweet.rawContent, tweet.user.username, tweet.replyCount,
-                                     tweet.retweetCount, tweet.likeCount, tweet.quoteCount, tweet.inReplyToTweetId])
+                                     tweet.retweetCount, tweet.likeCount])
         #wait_counter += 1
 
         # if tweet.inReplyToTweetId is None:
