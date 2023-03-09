@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from scripts.snscraper import get_tweet
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -8,18 +9,24 @@ cors = CORS(app)
 def home():
     return 'Hello 310.ai'
 
+
 @app.route('/accounts')
 def accounts():
-    return [{ "name": "Elon Musk", "avatar": "", "background": "" }]
+    return [{"name": "Elon Musk", "avatar": "", "background": ""}]
+
 
 @app.route('/audience')
 def audience():
     return 'audience'
 
+
 @app.route('/sentiment')
 def sentiment():
     return 'sentiment'
-    
-@app.route('/tweets')
-def tweets():
-    return 'tweets'
+
+
+@app.route('/tweets/<username>')
+def tweets(username):
+    since = '2023-02-01'
+    tweet_list = get_tweet(username=username, since=since)
+    return tweet_list
