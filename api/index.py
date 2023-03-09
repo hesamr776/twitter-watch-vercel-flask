@@ -12,7 +12,11 @@ def home():
 
 @app.route('/accounts')
 def accounts():
-    return [{"name": "Elon Musk", "avatar": "", "background": ""}]
+    return [
+        {"id": "elonmusk", "name": "Elon Musk", "avatar": "/elonmusk.jpg", "background": "/elonmusk-bg.jpeg"},
+        {"id": "barackobama", "name": "Barack Obama", "avatar": "/barackobama.jpg", "background": "/barackobama-bg.jpeg"},
+        {"id": "yannlecun", "name": "Yann Lecun", "avatar": "/yannlecun.jpg", "background": "/yannlecun-bg.jpeg"}
+    ]
 
 
 @app.route('/audience')

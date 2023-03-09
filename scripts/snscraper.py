@@ -36,19 +36,22 @@ def search(text, username, since, until, retweet, replies):
 def get_tweet(username, since):
     # Created a list to append all tweet attributes(data)
     attributes_container = []
+    replies = []
 
     query = search('', str(username), '2023-02-01', '', 'y', 'y')
 
     # Using TwitterSearchScraper to scrape data and append tweets to list
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
+
+        attributes_container.append([tweet.date, tweet.id, tweet.rawContent, tweet.user.username, tweet.replyCount,
+                                     tweet.retweetCount, tweet.likeCount, tweet.quoteCount, tweet.inReplyToTweetId])
+
         if tweet.inReplyToTweetId is None:
-            attributes_container.append([tweet.date, tweet.id, tweet.rawContent, tweet.user.username, tweet.replyCount,
-                                         tweet.retweetCount, tweet.likeCount, tweet.quoteCount, tweet.inReplyToTweetId])
+            for j, reply in enumerate(
+                    sntwitter.TwitterSearchScraper(f'conversation_id:{tweet.conversationId}').get_items()):
+                attributes_container.append(
+                    [reply.date, reply.id, reply.rawContent, reply.user.username, reply.replyCount,
+                     reply.retweetCount, reply.likeCount, reply.quoteCount, reply.inReplyToTweetId])
 
-    # Creating a dataframe from the tweets list above
-    # tweets_df = pd.DataFrame(attributes_container, columns=['DateTime', 'TweetId', 'Text', 'Username', 'ReplyCount',
-    # 'RetweetCount', 'LikeCount', 'QuoteCount', '-'])
-
-    # Creating a dataframe from the tweets list above
-    # print(attributes_container)
+    print(len(attributes_container))
     return attributes_container
