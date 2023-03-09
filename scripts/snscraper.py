@@ -46,10 +46,10 @@ def get_tweet(username, since):
         attributes_container.append([tweet.date, tweet.id, tweet.rawContent, tweet.user.username, tweet.replyCount,
                                      tweet.retweetCount, tweet.likeCount, tweet.quoteCount, tweet.inReplyToTweetId])
 
-        if tweet.inReplyToTweetId is None:
-            for j, reply in enumerate(
-                    sntwitter.TwitterSearchScraper(f'conversation_id:{tweet.conversationId}').get_items()):
-                attributes_container.append(
+        #if tweet.inReplyToTweetId is None:
+        for j, reply in enumerate(
+                sntwitter.TwitterSearchScraper(f'conversation_id:{tweet.conversationId}').get_items()):
+            attributes_container.append(
                     [reply.date, reply.id, reply.rawContent, reply.user.username, reply.replyCount,
                      reply.retweetCount, reply.likeCount, reply.quoteCount, reply.inReplyToTweetId])
 
