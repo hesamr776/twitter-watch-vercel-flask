@@ -7,7 +7,7 @@ cors = CORS(app)
 
 @app.route('/')
 def home():
-    return 'Hello 310.ai v5'
+    return 'Hello 310.ai v6'
 
 
 @app.route('/accounts')
