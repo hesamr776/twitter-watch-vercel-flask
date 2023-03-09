@@ -57,7 +57,7 @@ def get_tweet(username, since):
                  reply.retweetCount, reply.likeCount, reply.quoteCount, reply.inReplyToTweetId])
             wait_counter += 1
 
-            if wait_counter % 300 == 0:
+            if wait_counter % 100 == 0:
                 time.sleep(50)
 
     print(len(attributes_container))
