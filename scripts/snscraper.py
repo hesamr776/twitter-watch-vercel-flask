@@ -40,25 +40,25 @@ def get_tweet(username, since):
     replies = []
 
     query = search('', str(username), '2023-02-01', '', 'y', 'y')
-    wait_counter = 0
+    #wait_counter = 0
 
     # Using TwitterSearchScraper to scrape data and append tweets to list
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
 
         attributes_container.append([tweet.date, tweet.id, tweet.rawContent, tweet.user.username, tweet.replyCount,
                                      tweet.retweetCount, tweet.likeCount, tweet.conversationId])
-        wait_counter += 1
+        #wait_counter += 1
 
-        #if tweet.inReplyToTweetId is None:
-        for j, reply in enumerate(
-                sntwitter.TwitterSearchScraper(f'conversation_id:{tweet.conversationId}').get_items()):
-            attributes_container.append(
-                [reply.date, reply.id, reply.rawContent, reply.user.username, reply.replyCount,
-                 reply.retweetCount, reply.likeCount, reply.quoteCount, reply.inReplyToTweetId])
-            wait_counter += 1
+        # if tweet.inReplyToTweetId is None:
+        #for j, reply in enumerate(
+        #        sntwitter.TwitterSearchScraper(f'conversation_id:{tweet.conversationId}').get_items()):
+        #    attributes_container.append(
+        #        [reply.date, reply.id, reply.rawContent, reply.user.username, reply.replyCount,
+        #         reply.retweetCount, reply.likeCount, reply.quoteCount, reply.inReplyToTweetId])
+        #    wait_counter += 1
 
-            if wait_counter % 100 == 0:
-                time.sleep(5)
+        #    if wait_counter % 100 == 0:
+        #        time.sleep(5)
 
     print(len(attributes_container))
     return attributes_container
