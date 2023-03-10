@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_cors import CORS
-from scripts.snscraper import get_tweet
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -42,7 +41,7 @@ def tweets(username):
             "username": username,
             "id": "1234567",
             "avatar": "/elonmusk.jpg",
-            "date":"10h",
+            "date": "10h",
             "text": 'just human rights',
             "sentiment": 1
         },
@@ -50,7 +49,7 @@ def tweets(username):
             "username": username,
             "id": "8765432",
             "avatar": "/elonmusk.jpg",
-            "date":"1d",
+            "date": "1d",
             "text": 'you are bad',
             "sentiment": 0
         },
@@ -58,11 +57,9 @@ def tweets(username):
             "username": username,
             "id": "12345678",
             "avatar": "/elonmusk.jpg",
-            "date":"2d",
+            "date": "2d",
             "text": 'normal tweet message',
             "sentiment": 1
         }
     ]
-
-    # return get_tweet(username=username, since=since)
    
