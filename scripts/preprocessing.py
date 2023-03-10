@@ -4,7 +4,6 @@ import string
 
 from nltk.stem.snowball import SnowballStemmer
 
-
 stopwordlist = ['a', 'about', 'above', 'after', 'again', 'ain', 'all', 'am', 'an',
                 'and', 'any', 'are', 'as', 'at', 'be', 'because', 'been', 'before',
                 'being', 'below', 'between', 'both', 'by', 'can', 'd', 'did', 'do',
@@ -31,10 +30,17 @@ class preprocess:
         self.punct_list = string.punctuation
         self.nlp = spacy.load("en_core_web_sm")
         self.stemmer = SnowballStemmer("english")
+        self.emoji_pattern = re.compile("["
+                                        u"\U0001F600-\U0001F64F"  # emoticons
+                                        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                                        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                                        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                                        "]+", flags=re.UNICODE)
 
         if auto:
             self.set_lower()
             self.cleaning_URLs()
+            self.cleaning_emojis()
             self.cleaning_numbers()
             # self.stopword_remover()
             self.clean_punct()
@@ -67,6 +73,10 @@ class preprocess:
         self.text = re.sub('[0-9]+', '', self.text)
         return self.text
 
+    def cleaning_emojis(self):
+        self.text = self.emoji_pattern.sub(r'', self.text)
+        return self.text
+
     def redundant_spaces(self):
         self.text = re.sub(' +', ' ', self.text)
         return self.text
@@ -91,6 +101,3 @@ class preprocess:
 
     def get_lemmatized_tokens(self):
         return self.lemmatized_tokens
-
-
-
