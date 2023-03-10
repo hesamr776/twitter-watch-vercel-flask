@@ -44,6 +44,7 @@ class preprocess:
             self.cleaning_numbers()
             # self.stopword_remover()
             self.clean_punct()
+            self.remove_newline_char()
             self.redundant_spaces()
             # self.cleaning_repeating_char()
             self.tokenize_and_stem()
@@ -79,6 +80,10 @@ class preprocess:
 
     def redundant_spaces(self):
         self.text = re.sub(' +', ' ', self.text)
+        return self.text
+
+    def remove_newline_char(self):
+        self.text = ''.join(self.text.splitlines())
         return self.text
 
     def tokenize_and_stem(self):

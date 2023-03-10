@@ -32,7 +32,7 @@ def search(text, username, since, until, retweet, replies):
     return query
 
 
-def get_tweet(username, since='2023-02-01', preproc=True):
+def get_tweet(username, since='2023-02-01', preproc=False):
 
     original_tweets = []
 
@@ -73,16 +73,18 @@ def get_tweet(username, since='2023-02-01', preproc=True):
         })
 
     try:
-        tweets_df = pd.DataFrame(original_tweets)
-        tweets_df.to_csv(f'../data/{username}_since-{since}.csv', encoding='utf-8')
+        with open(f'../data/{username}_since-{since}.json', 'w') as t:
+            json.dump(original_tweets, t, cls=DateTimeEncoder)
+        # tweets_df = pd.DataFrame(original_tweets)
+        # tweets_df.to_csv(f'../data/{username}_since-{since}.csv', encoding='utf-8')
     except:
-        print('failed to save file')
+        print('failed to save tweets')
         pass
 
     return original_tweets
 
 
-def get_reply(sinceId, language='en', preproc=True):
+def get_reply(sinceId, language='en', preproc=False):
     # The max_id is the ID of the tweet of interest, and the since_id is one below that; or in other words, since_id
     # filters for tweets newer than an ID (not inclusive) and max_id filters for tweets older than an ID (inclusive).
     # e.g. snscrape --jsonl twitter-search 'since_id:1303506596216045567 max_id:1303506596216045568 -filter:safe'
@@ -146,19 +148,20 @@ if __name__ == '__main__':
 
     for user in users:
 
-        tweets = get_tweet(user)
+        tweets = get_tweet(user, preproc=True)
 
         # the tweets which include empty list for replies, were just link or media
         replies = []
         for tweet in tweets:
             tweetId = tweet['id']
-            reply = get_reply(tweetId)
-            replies.append({'tweetId': tweetId, 'replies': reply})
+            reply = get_reply(tweetId, preproc=True)
+            if reply is not None:
+                replies.append({'tweetId': tweetId, 'replies': reply})
         print(f'scraping {user} has been done!')
 
         try:
             with open(f'../data/replyTo-{user}.json', 'w') as f:
                 json.dump(replies, f, cls=DateTimeEncoder)
         except:
-            print('failed to save file')
+            print('failed to save replies')
             pass
