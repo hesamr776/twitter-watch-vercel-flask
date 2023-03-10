@@ -2,7 +2,6 @@ import sys
 import snscrape.modules.twitter as sntwitter
 import pandas as pd
 import datetime
-import time
 import json
 from json import JSONEncoder
 from preprocessing import preprocess
@@ -88,7 +87,7 @@ def get_reply(sinceId, language='en', preproc=True):
     # filters for tweets newer than an ID (not inclusive) and max_id filters for tweets older than an ID (inclusive).
     # e.g. snscrape --jsonl twitter-search 'since_id:1303506596216045567 max_id:1303506596216045568 -filter:safe'
     replies = []
-    max_reply = 5
+    max_reply = 20
     for j, reply in enumerate(
             sntwitter.TwitterSearchScraper(f'since_id:{str(sinceId)} -filter:safe').get_items()):
 
