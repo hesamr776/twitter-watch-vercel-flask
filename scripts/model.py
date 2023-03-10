@@ -1,5 +1,6 @@
 import transformers
-from transformers import BertModel, BertTokenizer, AdamW, get_linear_schedule_with_warmup
+from transformers import BertModel, BertTokenizer, get_linear_schedule_with_warmup
+from torch.optim import AdamW
 import torch
 import torch.nn as nn
 import numpy as np
@@ -28,7 +29,7 @@ class ReviewDataset(Dataset):
             add_special_tokens=True,
             max_length=self.max_len,
             return_token_type_ids=False,
-            padding='longest',
+            padding='max_length',
             return_attention_mask=True,
             return_tensors='pt',
         )
@@ -126,49 +127,37 @@ def eval_model(model, data_loader, loss_fn, device, n_examples):
     return correct_predictions / n_examples, np.mean(losses)
 
 
-def data_prepration():
+def read_data():
     df = pd.read_csv('../data/tweet_dataset/training.1600000.processed.noemoticon.csv', encoding="ISO-8859-1",
                      names=['target', 'ids', 'date', 'flag', 'user', 'text'])
 
-    df = df.sample(25000)
+    # df = df.sample(25000)
     df = df[['text', 'target']]
     df['target'] = df['target'].replace(4, 1)
-
-    pos = df[df['target'] == 1]
-    neg = df[df['target'] == 0]
-
-    pos = pos.iloc[:int(100)]
-    neg = neg.iloc[:int(100)]
-
-    data = pd.concat([pos, neg])
 
     # preprocess with class
     print('START PREPROCESSING')
     # data['text'] = data['text'].apply(lambda text: preprocess(text).get_result())
-    return data
+    return df
 
 
 if __name__ == "__main__":
-
-    data = data_prepration()
+    MAX_LEN = 120
+    BATCH_SIZE = 32
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(device)
 
     PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
     tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
-    MAX_LEN = 120
-
-    BATCH_SIZE = 32
+    data = read_data()
     train_data_loader = create_data_loader(data, tokenizer, MAX_LEN, BATCH_SIZE)
-
-    bert_model = BertModel.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
     model = SentimentClassifier(2)
     model = model.to(device)
 
     EPOCHS = 5
-    optimizer = AdamW(model.parameters(), lr=2e-5, correct_bias=False)
+    optimizer = AdamW(model.parameters(), lr=2e-5)
     total_steps = len(train_data_loader) * EPOCHS
     scheduler = get_linear_schedule_with_warmup(
         optimizer,
