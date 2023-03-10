@@ -6,32 +6,25 @@ import time
 
 
 def search(text, username, since, until, retweet, replies):
-    q = text
+    query = text
 
     if username != '':
-        q += f" from:{username}"
+        query += f" from:{username}"
 
     if until == '':
         until = datetime.datetime.strftime(datetime.datetime.today(), '%Y-%m-%d')
-    q += f" until:{until}"
+    query += f" until:{until}"
     if since == '':
         since = datetime.datetime.strftime(datetime.datetime.strptime(until, '%Y-%m-%d') - datetime.timedelta(days=7)
                                            , '%Y-%m-%d')
-    q += f" since:{since}"
+    query += f" since:{since}"
 
     if retweet == 'y':
-        q += f" exclude:retweets"
+        query += f" exclude:retweets"
     if replies == 'y':
-        q += f" exclude:replies"
+        query += f" exclude:replies"
 
-    # FILE NAME
-    if username != '' and text != '':
-        filename = f"{since}_{until}_{username}_{text}.csv"
-    elif username != "":
-        filename = f"{since}_{until}_{username}.csv"
-    else:
-        filename = f"{since}_{until}_{text}.csv"
-    return q
+    return query
 
 
 def get_tweet(username, since):
@@ -44,18 +37,26 @@ def get_tweet(username, since):
 
     # Using TwitterSearchScraper to scrape data and append tweets to list
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
-        attributes_container.append(
-            {'date': tweet.date, 'id': tweet.id, 'text': tweet.rawContent, 'username': tweet.user.username,
-             'conversationId': tweet.conversationId})
+        attributes_container.append({
+            'id': tweet.id,
+            'date': tweet.date,
+            'text': tweet.rawContent,
+            'username': tweet.user.username,
+            'conversationId': tweet.conversationId
+        })
         # wait_counter += 1
 
         # if tweet.inReplyToTweetId is None:
         # for j, reply in enumerate(
         #        sntwitter.TwitterSearchScraper(f'conversation_id:{tweet.conversationId}').get_items()):
-        #    attributes_container.append(
-        #        [reply.date, reply.id, reply.rawContent, reply.user.username, reply.replyCount,
-        #         reply.retweetCount, reply.likeCount, reply.quoteCount, reply.inReplyToTweetId])
-        #    wait_counter += 1
+        #    replies.append({
+        #     'id': tweet.id,
+        #     'date': tweet.date,
+        #     'text': tweet.rawContent,
+        #     'username': tweet.user.username,
+        #     'conversationId': tweet.conversationId
+        # })
+        # wait_counter += 1
 
         #    if wait_counter % 100 == 0:
         #        time.sleep(5)

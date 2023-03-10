@@ -5,6 +5,8 @@ from scripts.snscraper import get_tweet
 app = Flask(__name__)
 cors = CORS(app)
 
+since = '2023-02-01'
+
 @app.route('/')
 def home():
     return 'Hello 310.ai v8'
@@ -19,9 +21,13 @@ def accounts():
     ]
 
 
-@app.route('/audience')
-def audience():
-    return 'audience'
+@app.route('/audience/<username>')
+def audience(username):
+    return [
+        { "id": "elonmusk", "avatar": "/elonmusk.jpg" },
+        { "id": "barackobama", "avatar": "/barackobama.jpg" },
+        { "id": "yannlecun", "avatar": "/yannlecun.jpg" }
+    ]
 
 
 @app.route('/sentiment')
@@ -31,6 +37,32 @@ def sentiment():
 
 @app.route('/tweets/<username>')
 def tweets(username):
-    since = '2023-02-01'
-    tweet_list = get_tweet(username=username, since=since)
-    return tweet_list
+    return [
+        {
+            "username": username,
+            "id": "1234567",
+            "avatar": "/elonmusk.jpg",
+            "date":"10h",
+            "text": 'just human rights',
+            "sentiment": 1
+        },
+        {
+            "username": username,
+            "id": "8765432",
+            "avatar": "/elonmusk.jpg",
+            "date":"1d",
+            "text": 'you are bad',
+            "sentiment": 0
+        },
+        {
+            "username": username,
+            "id": "12345678",
+            "avatar": "/elonmusk.jpg",
+            "date":"2d",
+            "text": 'normal tweet message',
+            "sentiment": 1
+        }
+    ]
+
+    # return get_tweet(username=username, since=since)
+   
