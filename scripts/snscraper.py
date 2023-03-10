@@ -5,7 +5,7 @@ import datetime
 import time
 import json
 from json import JSONEncoder
-from scripts.preprocessing import preprocess
+from preprocessing import preprocess
 
 from transformers import pipeline
 sentiment_pipeline = pipeline("sentiment-analysis")
@@ -49,15 +49,20 @@ def get_tweet(username, since='2023-02-01', preproc=True):
                 break
 
         if preproc:
-            text = preprocess(tweet.rawContent)
+            text = preprocess(tweet.rawContent).get_result()
         else:
             text = tweet.rawContent
+
+        if len(text) == 0:
+            continue
+
         sentiment_prediction = sentiment_pipeline(str(text))
-        sentiment = None
-        if sentiment_prediction[0]['label'] == 'NEGATIVE':
+        if sentiment_prediction[0]['label'] == 'NEGATIVE' and sentiment_prediction[0]['score'] > 0.8:
             sentiment = 0
-        elif sentiment_prediction[0]['label'] == 'POSITIVE':
+        elif sentiment_prediction[0]['label'] == 'POSITIVE' and sentiment_prediction[0]['score'] > 0.8:
             sentiment = 1
+        else:
+            sentiment = -1
 
         original_tweets.append({
             'id': tweet.id,
@@ -83,23 +88,28 @@ def get_reply(sinceId, language='en', preproc=True):
     # filters for tweets newer than an ID (not inclusive) and max_id filters for tweets older than an ID (inclusive).
     # e.g. snscrape --jsonl twitter-search 'since_id:1303506596216045567 max_id:1303506596216045568 -filter:safe'
     replies = []
-    max_tweet = 5
+    max_reply = 5
     for j, reply in enumerate(
             sntwitter.TwitterSearchScraper(f'since_id:{str(sinceId)} -filter:safe').get_items()):
 
-        if j >= max_tweet:
+        if j >= max_reply:
             break
 
         if preproc:
-            text = preprocess(reply.rawContent)
+            text = preprocess(reply.rawContent).get_result()
         else:
             text = reply.rawContent
+
+        if len(text) == 0:
+            continue
+
         sentiment_prediction = sentiment_pipeline(str(text))
-        sentiment = None
-        if sentiment_prediction[0]['label'] == 'NEGATIVE':
+        if sentiment_prediction[0]['label'] == 'NEGATIVE' and sentiment_prediction[0]['score'] > 0.8:
             sentiment = 0
-        elif sentiment_prediction[0]['label'] == 'POSITIVE':
+        elif sentiment_prediction[0]['label'] == 'POSITIVE' and sentiment_prediction[0]['score'] > 0.8:
             sentiment = 1
+        else:
+            sentiment = -1
 
         if language == 'all':
             replies.append({
@@ -116,7 +126,7 @@ def get_reply(sinceId, language='en', preproc=True):
                 replies.append({
                     'id': reply.id,
                     'date': reply.date,
-                    'text': reply.rawContent,
+                    'text': text,
                     'username': reply.user.username,
                     'conversationId': reply.conversationId,
                     'sentiment': sentiment
@@ -139,6 +149,7 @@ if __name__ == '__main__':
 
         tweets = get_tweet(user)
 
+        # the tweets which include empty list for replies, were just link or media
         replies = []
         for tweet in tweets:
             tweetId = tweet['id']

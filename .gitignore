@@ -11,4 +11,6 @@ venv/
 ENV/ 
 env.bak/ 
 venv.bak/
-data/
+data/tweet_dataset
+data/*.csv
+data/*.json
