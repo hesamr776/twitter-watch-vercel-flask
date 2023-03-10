@@ -28,7 +28,7 @@ class ReviewDataset(Dataset):
             add_special_tokens=True,
             max_length=self.max_len,
             return_token_type_ids=False,
-            pad_to_max_length=True,
+            padding='longest',
             return_attention_mask=True,
             return_tensors='pt',
         )
@@ -56,7 +56,7 @@ def create_data_loader(df, tokenizer, max_len, batch_size):
 class SentimentClassifier(nn.Module):
     def __init__(self, n_classes):
         super(SentimentClassifier, self).__init__()
-        self.bert = BertModel.from_pretrained(PRE_TRAINED_MODEL_NAME)
+        self.bert = BertModel.from_pretrained(PRE_TRAINED_MODEL_NAME, return_dict=False)
         self.drop = nn.Dropout(p=0.4)
         # self.out = nn.Linear(self.bert.config.hidden_size, n_classes)
         self.out1 = nn.Linear(self.bert.config.hidden_size, 128)
@@ -112,9 +112,9 @@ def eval_model(model, data_loader, loss_fn, device, n_examples):
     correct_predictions = 0
     with torch.no_grad():
         for d in data_loader:
-            input_ids = d["input_ids"].to(device)
-            attention_mask = d["attention_mask"].to(device)
-            targets = d["targets"].to(device)
+            input_ids = torch.tensor(d["input_ids"]).to(device)
+            attention_mask = torch.tensor(d["attention_mask"]).to(device)
+            targets = torch.tensor(d["targets"]).to(device)
             outputs = model(
                 input_ids=input_ids,
                 attention_mask=attention_mask
@@ -157,24 +157,7 @@ if __name__ == "__main__":
     PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
     tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
-    from tqdm import tqdm
-
-    token_lens = []
-    for txt in tqdm(data.text):
-        tokens = tokenizer.encode(txt, max_length=512)
-        token_lens.append(len(tokens))
-
-    # sns.distplot(token_lens)
-
     MAX_LEN = 120
-
-    X = data.text.apply(lambda x: ' '.join(x))
-    y = data.target
-
-    X = np.array(X).ravel()
-    y = np.array(y).ravel()
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=30)
 
     BATCH_SIZE = 32
     train_data_loader = create_data_loader(data, tokenizer, MAX_LEN, BATCH_SIZE)
